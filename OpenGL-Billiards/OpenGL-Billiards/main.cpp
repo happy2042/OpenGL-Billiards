@@ -5,6 +5,17 @@
 #include <GL/freeglut.h>
 #pragma comment(lib, "freeglut.lib")
 
+// ビリヤード作るぞ！！！！！！！
+// TODO: 「シーンを奥に移動」から「カメラ位置を移動」に変える
+// TODO: カメラを移動させる（優先度: 低）
+// TODO: ボールのインスタンスを生成、表示させる
+// TODO: 台のインスタンスを生成、表示させる
+// TODO: ボールに初速度を与え、移動させる
+
+// 初期ウィンドウのサイズ指定
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
 #define PX 0.0                     /* 初期位置　　　　　 */
 #define PZ 0.0                     /* 初期位置　　　　　 */
 #define W 4                        /* 台の幅の２分の１　 */
@@ -21,9 +32,9 @@ static int frame = 0;              /* 現在のフレーム数　 */
 static double vx0, vz0;            /* パックの初速度　　 */
 static double px0 = PX, pz0 = PZ;  /* パックの初期位置　 */
 
-								   /*
-								   * 台を描く
-								   */
+/*
+* 台を描く
+*/
 static void myGround(double height)
 {
 	const static GLfloat ground[][4] = {   /* 台の色　　　 */
@@ -125,14 +136,14 @@ static void display(void)
 	double px = vx0 * p + px0;                          /* パックの現在位置 */
 	double pz = vz0 * p + pz0;                          /* パックの現在位置 */
 
-														/*
-														** パックが台の壁に当たったら初期位置と初速度を変更する
-														** 速度（比）が一定以下になったら現在位置を初期位置にして
-														** アニメーションを止める
-														** （ここは自分で考えてください）
-														*/
+	/*
+	** パックが台の壁に当たったら初期位置と初速度を変更する
+	** 速度（比）が一定以下になったら現在位置を初期位置にして
+	** アニメーションを止める
+	** （ここは自分で考えてください）
+	*/
 
-														/* フレーム数（画面表示を行った回数）をカウントする */
+	/* フレーム数（画面表示を行った回数）をカウントする */
 	++frame;
 
 	/* 画面クリア */
@@ -150,11 +161,13 @@ static void display(void)
 
 	/* シーンの描画 */
 	myGround(0.0);
+
 	glPushMatrix();
-	glTranslated(px, 0.0, pz);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
-	myCylinder(0.3, 0.1, 8);
+		glTranslated(px, 0.0, pz);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
+		myCylinder(0.3, 0.1, 8);
 	glPopMatrix();
+	/* シーンの描画ここまで */
 
 	glFlush();
 }
@@ -183,6 +196,8 @@ static void keyboard(unsigned char key, int x, int y)
 	}
 }
 
+// マウスクリック時の台の座標を計算する
+// 変更予定、もしくは削除
 static void mouse(int button, int state, int x, int y)
 {
 	switch (button) {
@@ -238,6 +253,7 @@ static void mouse(int button, int state, int x, int y)
 static void init(void)
 {
 	/* 初期設定 */
+	// ライトは初期設定
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -247,6 +263,9 @@ static void init(void)
 
 int main(int argc, char *argv[])
 {
+	// 初期ウィンドウのサイズ指定
+	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
