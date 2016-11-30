@@ -2,19 +2,31 @@
 #include <stdlib.h>
 #include <math.h>
 
+// freeglut使うときはインクルード
 #include <GL/freeglut.h>
 #pragma comment(lib, "freeglut.lib")
+// freeglut使うときはインクルード(ここまで)
+
+#include "Ball.h"
 
 // ビリヤード作るぞ！！！！！！！
 // TODO: 「シーンを奥に移動」から「カメラ位置を移動」に変える
 // TODO: カメラを移動させる（優先度: 低）
-// TODO: ボールのインスタンスを生成、表示させる
-// TODO: 台のインスタンスを生成、表示させる
+// TODO: ボールのインスタンスを生成
+// TODO: ボールを表示させる
+// TODO: 台のインスタンスを生成
+// TODO: 台を表示させる
 // TODO: ボールに初速度を与え、移動させる
 
 // 初期ウィンドウのサイズ指定
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 640	// ウィンドウの横の長さ
+#define WINDOW_HEIGHT 480	// ウィンドウの横の長さ
+
+// ボールに関するパラメータなど
+#define BALL_NUMBER 1			// ボールの個数
+#define BALL_WEIGHT 0.17		// ボールの質量（単位はkg）
+#define BALL_RADIUS 0.02855		// ボールの半径（単位はメートル）
+static Ball* ballAry;				// ボールのインスタンス生成用
 
 #define PX 0.0                     /* 初期位置　　　　　 */
 #define PZ 0.0                     /* 初期位置　　　　　 */
@@ -160,13 +172,18 @@ static void display(void)
 	glRotated(45.0, 1.0, 0.0, 0.0);
 
 	/* シーンの描画 */
-	myGround(0.0);
 
+	myGround(0.0);
+	/*// パックの描画
 	glPushMatrix();
 		glTranslated(px, 0.0, pz);
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
 		myCylinder(0.3, 0.1, 8);
 	glPopMatrix();
+	*/
+	// ボールの描画
+	ballAry[0].DrawBall();
+
 	/* シーンの描画ここまで */
 
 	glFlush();
@@ -261,11 +278,26 @@ static void init(void)
 	glEnable(GL_LIGHT0);
 }
 
+// メイン関数
 int main(int argc, char *argv[])
 {
 	// 初期ウィンドウのサイズ指定
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+	// 以下テストパラメータ
+	vec3 testPos(1.0f, 0.0f, 0.0f);
+	GLfloat testColor[] = { 0.8f, 0.2f, 0.2f, 1.0f };
+	float testRadius = 1.0f;
+	// テストパラメータ設定ここまで
+
+	// ボール生成、パラメータを設定
+	ballAry = new Ball[BALL_NUMBER];
+	for (int i = 0; i < BALL_NUMBER; i++) {
+		// パラメータを各ボールにセットしていく
+		ballAry[i].setParam(testPos, testColor, BALL_WEIGHT, testRadius);
+	}
+
+	// 以下glut関係
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
@@ -275,5 +307,10 @@ int main(int argc, char *argv[])
 	glutMouseFunc(mouse);
 	init();
 	glutMainLoop();
+	// glut関係ここまで
+
+	// 配列を解放
+	delete[] ballAry;
+
 	return 0;
 }
