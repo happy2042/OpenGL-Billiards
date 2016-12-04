@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <iostream>
+using namespace std;
 
 // freeglut使うときはインクルード
 #include <GL/freeglut.h>
@@ -9,14 +11,14 @@
 
 #include "Ball.h"
 
-// ビリヤード作るぞ！！！！！！！
-// TODO: 「シーンを奥に移動」から「カメラ位置を移動」に変える
-// TODO: カメラを移動させる（優先度: 低）
-// TODO: ボールのインスタンスを生成
-// TODO: ボールを表示させる
+// ビリヤード作るぞ！！！！！！
+// TODO: Unityで言うdeltaTimeの計算を実装
+// TODO: 速度計算をdeltaTime(仮名)に合わせて行う（現状は1フレームごとの計算になってしまっている）
+// TODO: 台を実寸通りの大きさに調整
 // TODO: 台のインスタンスを生成
 // TODO: 台を表示させる
-// TODO: ボールに初速度を与え、移動させる
+// TODO: カメラを移動させる（優先度低）
+// TODO: 「シーンを奥に移動」から「カメラ位置を移動」に変える（優先度低）
 
 // 初期ウィンドウのサイズ指定
 #define WINDOW_WIDTH 640	// ウィンドウの横の長さ
@@ -158,6 +160,12 @@ static void display(void)
 	/* フレーム数（画面表示を行った回数）をカウントする */
 	++frame;
 
+	// [追加]
+	// ボールの移動
+	ballAry[0].moveBall();
+	cout << ballAry[0].getVelocity().length() << endl;
+	// [追加] ここまで
+
 	/* 画面クリア */
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -182,11 +190,14 @@ static void display(void)
 	glPopMatrix();
 	*/
 	// ボールの描画
-	ballAry[0].DrawBall();
+	ballAry[0].drawBall();
 
 	/* シーンの描画ここまで */
 
-	glFlush();
+	// 再描画をかける
+	//glFlush();
+	glutSwapBuffers();
+	glutPostRedisplay();
 }
 
 static void resize(int w, int h)
@@ -207,9 +218,19 @@ static void resize(int w, int h)
 
 static void keyboard(unsigned char key, int x, int y)
 {
-	/* ESC か q をタイプしたら終了 */
-	if (key == '\033' || key == 'q') {
+	switch (key) {
+	// ボールに速度を与える（テスト用）
+	case 'a':
+	case 'A':
+		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -1.0f));
+		break;
+	// 終了ボタン
+	case 'q':
+	case 'Q':
+	case '\033':  /* '\033' は ESC の ASCII コード */
 		exit(0);
+	default:
+		break;
 	}
 }
 
@@ -288,6 +309,7 @@ int main(int argc, char *argv[])
 	vec3 testPos(1.0f, 0.0f, 0.0f);
 	GLfloat testColor[] = { 0.8f, 0.2f, 0.2f, 1.0f };
 	float testRadius = 1.0f;
+	vec3 initVelocity(0.0f, 0.0f, 0.0f);
 	// テストパラメータ設定ここまで
 
 	// ボール生成、パラメータを設定
@@ -295,11 +317,14 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < BALL_NUMBER; i++) {
 		// パラメータを各ボールにセットしていく
 		ballAry[i].setParam(testPos, testColor, BALL_WEIGHT, testRadius);
+		ballAry[i].setVelocity(initVelocity);
 	}
 
 	// 以下glut関係
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
+	// glutInitDisplayModeのこと（引数に関して）を調べる必要あり
+	//glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
 	glutReshapeFunc(resize);
