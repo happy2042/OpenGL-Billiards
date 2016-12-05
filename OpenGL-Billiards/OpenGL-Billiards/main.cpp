@@ -197,7 +197,6 @@ static void display(void)
 	// 再描画をかける
 	//glFlush();
 	glutSwapBuffers();
-	glutPostRedisplay();
 }
 
 static void resize(int w, int h)
@@ -222,7 +221,7 @@ static void keyboard(unsigned char key, int x, int y)
 	// ボールに速度を与える（テスト用）
 	case 'a':
 	case 'A':
-		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -1.0f));
+		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -0.3f));
 		break;
 	// 終了ボタン
 	case 'q':
@@ -299,6 +298,14 @@ static void init(void)
 	glEnable(GL_LIGHT0);
 }
 
+// タイマー関数
+// 画面の再描画を行っている
+void timer(int value) {
+	glutPostRedisplay();
+	// ここで描画頻度を設定する
+	glutTimerFunc(16, timer, 0);
+}
+
 // メイン関数
 int main(int argc, char *argv[])
 {
@@ -306,9 +313,9 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// 以下テストパラメータ
-	vec3 testPos(1.0f, 0.0f, 0.0f);
+	vec3 testPos(1.0f, 0.5f, 3.0f);
 	GLfloat testColor[] = { 0.8f, 0.2f, 0.2f, 1.0f };
-	float testRadius = 1.0f;
+	float testRadius = 0.5f;
 	vec3 initVelocity(0.0f, 0.0f, 0.0f);
 	// テストパラメータ設定ここまで
 
@@ -327,6 +334,8 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
+	// タイマー関数
+	glutTimerFunc(100, timer, 0);
 	glutReshapeFunc(resize);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
