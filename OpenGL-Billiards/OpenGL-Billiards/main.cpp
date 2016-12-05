@@ -221,7 +221,7 @@ static void keyboard(unsigned char key, int x, int y)
 	// ボールに速度を与える（テスト用）
 	case 'a':
 	case 'A':
-		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -0.3f));
+		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -0.5f));
 		break;
 	// 終了ボタン
 	case 'q':
