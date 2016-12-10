@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
-using namespace std;
+#include <time.h>
+#include <sys/timeb.h>
+#include <cstdint>
+#include <Windows.h>
 
 // freeglut使うときはインクルード
 #include <GL/freeglut.h>
@@ -10,6 +13,9 @@ using namespace std;
 // freeglut使うときはインクルード(ここまで)
 
 #include "Ball.h"
+#include "FPSCounter.h"
+
+using namespace std;
 
 // ビリヤード作るぞ！！！！！！
 // TODO: Unityで言うdeltaTimeの計算を実装
@@ -29,6 +35,36 @@ using namespace std;
 #define BALL_WEIGHT 0.17		// ボールの質量（単位はkg）
 #define BALL_RADIUS 0.02855		// ボールの半径（単位はメートル）
 static Ball* ballAry;				// ボールのインスタンス生成用
+
+/*
+* FPS関連の変数（処理ちゃんと書けたら別ヘッダーに移す）
+*/
+double deltaTime;	// FPSの逆数をとったもの
+static CFPSCounter FPS(10);	// FPS計測クラス
+const float frameInterval = 1000.0f / 60;	// 60FPSの基準時間（とする）
+float nextFrame;
+
+int startSec, nowSec;		// 最初の時刻と現在の時刻（秒）
+int sec, millisec;			// 実行開始からの時刻差分を記録する変数(秒、ミリ秒)
+struct timeb timebuffer;	// 時間系をまとめた構造体（?）
+
+// 現在時刻を更新する関数
+void getNow() {
+	ftime(&timebuffer);
+	nowSec = timebuffer.time;
+	sec = nowSec - startSec;
+	millisec = timebuffer.millitm;
+	millisec += sec * 1000;
+}
+
+// 現在時刻のミリ秒を返す関数
+int getNowMillisec() {
+	getNow();
+	return millisec;
+}
+/*
+* FPS関連ここまで
+*/
 
 #define PX 0.0                     /* 初期位置　　　　　 */
 #define PZ 0.0                     /* 初期位置　　　　　 */
@@ -140,63 +176,66 @@ static void myCylinder(double radius, double height, int sides)
 static void display(void)
 {
 	const static GLfloat lightpos[] = { 3.0, 4.0, 5.0, 1.0 }; /* 光源の位置 */
-	const static GLfloat yellow[] = { 0.9, 0.9, 0.2, 1.0 };   /* パックの色 */
 
 	double t = TIMESCALE * frame;         /* フレーム数から現在時刻を求める */
 
-	double v = exp(-MU * t / WEIGHT);                   /* パックの速度比　 */
-	double p = WEIGHT * (1.0 - v) / MU;                 /* パックの相対位置 */
-
-	double px = vx0 * p + px0;                          /* パックの現在位置 */
-	double pz = vz0 * p + pz0;                          /* パックの現在位置 */
-
-	/*
-	** パックが台の壁に当たったら初期位置と初速度を変更する
-	** 速度（比）が一定以下になったら現在位置を初期位置にして
-	** アニメーションを止める
-	** （ここは自分で考えてください）
-	*/
-
 	/* フレーム数（画面表示を行った回数）をカウントする */
-	++frame;
+	//++frame;
 
-	// [追加]
+	// FPS計測、表示
+	// 変数の型がわからないのでとりあえずdoubleで
+	double fps = FPS.GetFPS();	// FPS取得
+	cout << fps << endl;		// FPS表示
+	deltaTime = 1.0f / fps;		// deltaTimeの算出、fpsの逆数
+
 	// ボールの移動
-	ballAry[0].moveBall();
-	cout << ballAry[0].getVelocity().length() << endl;
-	// [追加] ここまで
+	ballAry[0].moveBall(deltaTime);
 
-	/* 画面クリア */
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// 現在時刻更新
+	uint32_t now = getNowMillisec();
 
-	/* モデルビュー変換行列の初期化 */
-	glLoadIdentity();
+	if (now < nextFrame) {
+		/* 画面クリア */
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/* 光源の位置を設定 */
-	glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+		/* モデルビュー変換行列の初期化 */
+		glLoadIdentity();
 
-	/* 視点の移動（物体の方を奥に移す）*/
-	glTranslated(0.0, 0.0, -20.0);
-	glRotated(45.0, 1.0, 0.0, 0.0);
+		/* 光源の位置を設定 */
+		glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-	/* シーンの描画 */
+		/* 視点の移動（物体の方を奥に移す）*/
+		glTranslated(0.0, 0.0, -20.0);
+		glRotated(45.0, 1.0, 0.0, 0.0);
 
-	myGround(0.0);
-	/*// パックの描画
-	glPushMatrix();
-		glTranslated(px, 0.0, pz);
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
-		myCylinder(0.3, 0.1, 8);
-	glPopMatrix();
-	*/
-	// ボールの描画
-	ballAry[0].drawBall();
+		/* シーンの描画 */
+		myGround(0.0);
+		/*// パックの描画
+		glPushMatrix();
+			glTranslated(px, 0.0, pz);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
+			myCylinder(0.3, 0.1, 8);
+		glPopMatrix();
+		*/
+		// ボールの描画
+		ballAry[0].drawBall();
+		/* シーンの描画ここまで */
 
-	/* シーンの描画ここまで */
+		// Zバッファをスワップさせる
+		// 再描画
+		glutSwapBuffers();
 
-	// 再描画をかける
-	//glFlush();
-	glutSwapBuffers();
+		// 現在時刻更新
+		now = getNowMillisec();
+
+		// 描画しても時間が余ってたら
+		if(now < nextFrame){
+			// 型変換が必要...
+			Sleep(static_cast<uint32_t>(nextFrame - now));
+		}
+	}
+	nextFrame += frameInterval;
+	glutPostRedisplay();
 }
 
 static void resize(int w, int h)
@@ -221,7 +260,7 @@ static void keyboard(unsigned char key, int x, int y)
 	// ボールに速度を与える（テスト用）
 	case 'a':
 	case 'A':
-		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -0.5f));
+		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -3.0f));
 		break;
 	// 終了ボタン
 	case 'q':
@@ -309,8 +348,12 @@ void timer(int value) {
 // メイン関数
 int main(int argc, char *argv[])
 {
-	// 初期ウィンドウのサイズ指定
-	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	// 開始時刻の記録
+	ftime(&timebuffer);
+	startSec = timebuffer.time;
+	millisec = timebuffer.millitm;
+	// floatでとりあえずFPS管理
+	float nextFrame = getNowMillisec() + frameInterval;	
 
 	// 以下テストパラメータ
 	vec3 testPos(1.0f, 0.5f, 3.0f);
@@ -328,14 +371,14 @@ int main(int argc, char *argv[])
 	}
 
 	// 以下glut関係
+	// 初期ウィンドウのサイズ指定
+	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInit(&argc, argv);
 	// glutInitDisplayModeのこと（引数に関して）を調べる必要あり
-	//glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
-	// タイマー関数
-	glutTimerFunc(100, timer, 0);
+	//glutTimerFunc(100, timer, 0);		// タイマー関数
 	glutReshapeFunc(resize);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);

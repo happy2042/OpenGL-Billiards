@@ -162,9 +162,11 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\Desktop\FPSCounter\FPSCounter.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\Desktop\FPSCounter\FPSCounter.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="vec3.h" />

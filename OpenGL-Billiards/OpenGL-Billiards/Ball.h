@@ -39,7 +39,7 @@ public:
 	~Ball(){}
 	void setParam(vec3 pos, GLfloat* color, float weight, float radius);
 	void drawBall();
-	void moveBall();
+	void moveBall(double deltaTime);
 
 	// setメソッド群
 	void setPos(vec3 pos);
@@ -71,13 +71,15 @@ void Ball::drawBall () {
 // ボールを動かす
 // positionの計算を行う
 // 雑すぎるのでもう少し分割したり、考えます...
-void Ball::moveBall() {
-	const float attenuation = 0.7;	// 速度の減衰率（暫定的に定義しておく）
+void Ball::moveBall(double deltaTime) {
+	const float dFlic = 1.5f;	// 動摩擦係数（何秒後にストップするか）
+	float attenuation = dFlic * (float)deltaTime;	// 速度の減衰率（暫定的に定義しておく）
+	attenuation = 1.0f - attenuation;	// 減衰率の計算（割合にする演算）
 
 	// 速度が一定以下になるまで、速度の足し込み計算をする
-	if (m_velocity.length() > 0.01f) {
+	if (m_velocity.length() > 0.1f) {
 		// 現在の位置に速度分を加算
-		m_position = m_position + m_velocity;
+		m_position = m_position + m_velocity * (float)deltaTime;
 		// 速度を変える（別メソッドで計算するかも）
 		// velocityに関してはもう少し複雑な式になるかもしれない
 		// velocityだけ計算するメソッドを作る必要があるかもしれない
