@@ -46,6 +46,7 @@ public:
 	void setVelocity(vec3 velocity);
 	// getメソッド群
 	vec3 getPos();
+	float getRadius();
 	vec3 getVelocity();
 };
 
@@ -104,6 +105,10 @@ void Ball::setVelocity(vec3 velocity) {
 // ボール位置
 vec3 Ball::getPos() {
 	return m_position;
+}
+// 半径
+float Ball::getRadius() {
+	return m_radius;
 }
 // 速度
 vec3 Ball::getVelocity() {

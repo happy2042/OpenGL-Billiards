@@ -1,17 +1,30 @@
-﻿2016/12/10 22:53:02 にビルドを開始しました。
+﻿2016/12/16 3:05:33 にビルドを開始しました。
      1>ノード 2 上のプロジェクト "C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\OpenGL-Billiards\OpenGL-Billiards.vcxproj" (Build ターゲット)。
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I"C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\OpenGL-Billiards\glut\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
          main.cpp
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(54): warning C4244: '=': 'time_t' から 'int' への変換です。データが失われる可能性があります。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(93): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(93): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(96): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(96): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(167): warning C4244: '引数': 'double' から 'GLfloat' への変換です。データが失われる可能性があります。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(168): warning C4244: '引数': 'double' から 'GLfloat' への変換です。データが失われる可能性があります。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(353): warning C4244: '=': 'time_t' から 'int' への変換です。データが失われる可能性があります。
-     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(369): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(23): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(23): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(28): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(28): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(40): warning C4200: 非標準の拡張機能が使用されています: 構造体または共用体中にサイズが 0 の配列があります。
+         c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(40): note: UDT にサイズが 0 の配列が含まれているときに、copy-ctor または copy-assignment オペレーターを生成することはできません。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(93): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\table.h(94): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(62): warning C4244: '=': 'time_t' から 'int' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(101): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(101): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(104): warning C4838: 'double' から 'const GLfloat' への変換には縮小変換が必要です
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(104): warning C4305: '初期化中': 'double' から 'const GLfloat' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(175): warning C4244: '引数': 'double' から 'GLfloat' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(176): warning C4244: '引数': 'double' から 'GLfloat' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(208): warning C4244: '初期化中': 'double' から 'float' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(209): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(210): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(412): warning C4244: '=': 'time_t' から 'int' への変換です。データが失われる可能性があります。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(431): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(433): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+     1>c:\users\happy\documents\visual studio 2015\projects\colopl\opengl-billiards\opengl-billiards\main.cpp(435): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\Debug\OpenGL-Billiards.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\OpenGL-Billiards\glut\lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\Debug\OpenGL-Billiards.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\happy\Documents\Visual Studio 2015\Projects\colopl\OpenGL-Billiards\Debug\OpenGL-Billiards.lib" /MACHINE:X86 Debug\FPSCounter.obj
          Debug\main.obj
@@ -24,4 +37,4 @@
 
 ビルドに成功しました。
 
-経過時間 00:00:01.16
+経過時間 00:00:01.14

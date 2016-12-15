@@ -12,29 +12,37 @@
 #pragma comment(lib, "freeglut.lib")
 // freeglut使うときはインクルード(ここまで)
 
+// 自作、持ち込みクラスはこちら
 #include "Ball.h"
+#include "Table.h"
 #include "FPSCounter.h"
 
 using namespace std;
 
 // ビリヤード作るぞ！！！！！！
-// TODO: Unityで言うdeltaTimeの計算を実装
-// TODO: 速度計算をdeltaTime(仮名)に合わせて行う（現状は1フレームごとの計算になってしまっている）
-// TODO: 台を実寸通りの大きさに調整
 // TODO: 台のインスタンスを生成
 // TODO: 台を表示させる
+// TODO: ボールが壁にぶつかったら反射する
+// TODO: ボールがボールにぶつかったら反射する
+// TODO: ボールを11個並べてブレイクショットができるかどうか検証
 // TODO: カメラを移動させる（優先度低）
 // TODO: 「シーンを奥に移動」から「カメラ位置を移動」に変える（優先度低）
+
+// 長さの基準はセンチメートルにする
+// 物理計算でキャストがめんどくさくなったらまた考えます
 
 // 初期ウィンドウのサイズ指定
 #define WINDOW_WIDTH 640	// ウィンドウの横の長さ
 #define WINDOW_HEIGHT 480	// ウィンドウの横の長さ
 
 // ボールに関するパラメータなど
-#define BALL_NUMBER 1			// ボールの個数
-#define BALL_WEIGHT 0.17		// ボールの質量（単位はkg）
+#define BALL_NUMBER 3			// ボールの個数
+#define BALL_WEIGHT 1.7		// ボールの質量（単位は100g毎）
 #define BALL_RADIUS 0.02855		// ボールの半径（単位はメートル）
 static Ball* ballAry;				// ボールのインスタンス生成用
+
+									// 台のインスタンス作る用
+Table table;
 
 /*
 * FPS関連の変数（処理ちゃんと書けたら別ヘッダーに移す）
@@ -48,7 +56,7 @@ int startSec, nowSec;		// 最初の時刻と現在の時刻（秒）
 int sec, millisec;			// 実行開始からの時刻差分を記録する変数(秒、ミリ秒)
 struct timeb timebuffer;	// 時間系をまとめた構造体（?）
 
-// 現在時刻を更新する関数
+							// 現在時刻を更新する関数
 void getNow() {
 	ftime(&timebuffer);
 	nowSec = timebuffer.time;
@@ -82,9 +90,9 @@ static int frame = 0;              /* 現在のフレーム数　 */
 static double vx0, vz0;            /* パックの初速度　　 */
 static double px0 = PX, pz0 = PZ;  /* パックの初期位置　 */
 
-/*
-* 台を描く
-*/
+								   /*
+								   * 台を描く
+								   */
 static void myGround(double height)
 {
 	const static GLfloat ground[][4] = {   /* 台の色　　　 */
@@ -179,17 +187,65 @@ static void display(void)
 
 	double t = TIMESCALE * frame;         /* フレーム数から現在時刻を求める */
 
-	/* フレーム数（画面表示を行った回数）をカウントする */
-	//++frame;
+										  /* フレーム数（画面表示を行った回数）をカウントする */
+										  //++frame;
 
-	// FPS計測、表示
-	// 変数の型がわからないのでとりあえずdoubleで
+										  // FPS計測、表示
+										  // 変数の型がわからないのでとりあえずdoubleで
 	double fps = FPS.GetFPS();	// FPS取得
 	cout << fps << endl;		// FPS表示
 	deltaTime = 1.0f / fps;		// deltaTimeの算出、fpsの逆数
 
+	// 衝突判定
+	// 撃力ベース（って名前らしい）
+	// 複合衝突の処理が出来ていない！！！！
+	float e = 0.5;	// ボール同士の反発係数
+	for (int i = 0; i < (BALL_NUMBER - 1); i++) {
+		for (int j = (i + 1); j < BALL_NUMBER; j++) {
+			if (vec3(ballAry[i].getPos() - ballAry[j].getPos()).length() < (ballAry[i].getRadius() + ballAry[j].getRadius())) {
+				vec3 n = unitVector(ballAry[i].getPos() - ballAry[j].getPos());
+				float J = -(e + 1) * dot(n, (ballAry[i].getVelocity() - ballAry[j].getVelocity()))
+					/ (1 / BALL_WEIGHT) + (1 / BALL_WEIGHT);
+				ballAry[i].setVelocity(ballAry[i].getVelocity() + n*J / BALL_WEIGHT);
+				ballAry[j].setVelocity(ballAry[j].getVelocity() - n*J / BALL_WEIGHT);
+			}
+		}
+	}
+
 	// ボールの移動
-	ballAry[0].moveBall(deltaTime);
+	for (int i = 0; i < BALL_NUMBER; i++) {
+		ballAry[i].moveBall(deltaTime);
+		// 壁と反発しているとき速度を反転させる
+		// 0.5は半径
+		// この処理が長いので関数で別に置くか、するかもしれない
+		// 速度が小さいと壁から脱出できない問題が発生！！！！
+		// 壁にも撃力を適用させるべきか
+		const float bound = 0.8f;	// 壁との反発係数
+		if (ballAry[i].getPos().x < -(W - 0.5)) {
+			ballAry[i].setVelocity(
+				vec3(ballAry[i].getVelocity().x * (-1),
+					ballAry[i].getVelocity().y,
+					ballAry[i].getVelocity().z) * bound);
+		}
+		if (ballAry[i].getPos().x > (W - 0.5)) {
+			ballAry[i].setVelocity(
+				vec3(ballAry[i].getVelocity().x * (-1),
+					ballAry[i].getVelocity().y,
+					ballAry[i].getVelocity().z) * bound);
+		}
+		if (ballAry[i].getPos().z < -(D - 0.5)) {
+			ballAry[i].setVelocity(
+				vec3(ballAry[i].getVelocity().x,
+					ballAry[i].getVelocity().y,
+					ballAry[i].getVelocity().z * (-1)) * bound);
+		}
+		if (ballAry[i].getPos().z > (D - 0.5)) {
+			ballAry[i].setVelocity(
+				vec3(ballAry[i].getVelocity().x,
+					ballAry[i].getVelocity().y,
+					ballAry[i].getVelocity().z * (-1)) * bound);
+		}
+	}
 
 	// 現在時刻更新
 	uint32_t now = getNowMillisec();
@@ -209,16 +265,19 @@ static void display(void)
 		glRotated(45.0, 1.0, 0.0, 0.0);
 
 		/* シーンの描画 */
+		//table.DrawTable();
 		myGround(0.0);
 		/*// パックの描画
 		glPushMatrix();
-			glTranslated(px, 0.0, pz);
-			glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
-			myCylinder(0.3, 0.1, 8);
+		glTranslated(px, 0.0, pz);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, yellow);
+		myCylinder(0.3, 0.1, 8);
 		glPopMatrix();
 		*/
 		// ボールの描画
-		ballAry[0].drawBall();
+		for (int i = 0; i < BALL_NUMBER; i++) {
+			ballAry[i].drawBall();
+		}
 		/* シーンの描画ここまで */
 
 		// Zバッファをスワップさせる
@@ -229,7 +288,7 @@ static void display(void)
 		now = getNowMillisec();
 
 		// 描画しても時間が余ってたら
-		if(now < nextFrame){
+		if (now < nextFrame) {
 			// 型変換が必要...
 			Sleep(static_cast<uint32_t>(nextFrame - now));
 		}
@@ -257,12 +316,12 @@ static void resize(int w, int h)
 static void keyboard(unsigned char key, int x, int y)
 {
 	switch (key) {
-	// ボールに速度を与える（テスト用）
+		// ボールに速度を与える（テスト用）
 	case 'a':
 	case 'A':
-		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -3.0f));
+		ballAry[0].setVelocity(vec3(0.0f, 0.0f, -10.0f));
 		break;
-	// 終了ボタン
+		// 終了ボタン
 	case 'q':
 	case 'Q':
 	case '\033':  /* '\033' は ESC の ASCII コード */
@@ -353,22 +412,39 @@ int main(int argc, char *argv[])
 	startSec = timebuffer.time;
 	millisec = timebuffer.millitm;
 	// floatでとりあえずFPS管理
-	float nextFrame = getNowMillisec() + frameInterval;	
+	float nextFrame = getNowMillisec() + frameInterval;
 
 	// 以下テストパラメータ
-	vec3 testPos(1.0f, 0.5f, 3.0f);
-	GLfloat testColor[] = { 0.8f, 0.2f, 0.2f, 1.0f };
+	GLfloat testColor1[] = { 0.8f, 0.2f, 0.2f, 1.0f };
+	GLfloat testColor2[] = { 0.2f, 0.2f, 0.8f, 1.0f };
+	GLfloat testColor3[] = { 0.2f, 0.8f, 0.0f, 1.0f };
 	float testRadius = 0.5f;
+	vec3 testPos1(0.0f, testRadius, 3.0f);
+	vec3 testPos2(testRadius, testRadius, -3.0f);
+	vec3 testPos3(-testRadius, testRadius, -3.0f);
 	vec3 initVelocity(0.0f, 0.0f, 0.0f);
 	// テストパラメータ設定ここまで
 
 	// ボール生成、パラメータを設定
 	ballAry = new Ball[BALL_NUMBER];
-	for (int i = 0; i < BALL_NUMBER; i++) {
-		// パラメータを各ボールにセットしていく
-		ballAry[i].setParam(testPos, testColor, BALL_WEIGHT, testRadius);
-		ballAry[i].setVelocity(initVelocity);
-	}
+	// パラメータを各ボールにセットしていく
+	ballAry[0].setParam(testPos1, testColor1, BALL_WEIGHT, testRadius);
+	ballAry[0].setVelocity(initVelocity);
+	ballAry[1].setParam(testPos2, testColor2, BALL_WEIGHT, testRadius);
+	ballAry[1].setVelocity(initVelocity);
+	ballAry[2].setParam(testPos3, testColor3, BALL_WEIGHT, testRadius);
+	ballAry[2].setVelocity(initVelocity);
+
+
+	// 台のインスタンス作成
+	/*
+	vec3 testTablePos(0.0f, 0.0f, 0.0f);
+	float groundWidth = 127;
+	float groundHeight = 254;
+	float wallWidth = 14;
+	float wallHeight = 3.7;
+	table.setParam(testTablePos, groundWidth, groundHeight, wallWidth, wallHeight);
+	*/
 
 	// 以下glut関係
 	// 初期ウィンドウのサイズ指定
